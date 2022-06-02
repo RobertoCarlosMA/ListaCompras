@@ -70,11 +70,15 @@ btnAgregar.addEventListener('click', (e) => {
 
     contador++;
     document.getElementById('contadorProductos').innerHTML = contador;
+    //window.sessionStorage    sessionStorage    window.localStorage    localStorage
+    localStorage.setItem('contadorProductos', contador);
     const precio = Math.floor((Math.random() * 50)*100)/100;
     const cantidad = parseFloat(txtNumero.value);
     costoTotal += (Math.floor((cantidad * precio)*100)/100);
     totalProductos += cantidad < 1 ? Math.ceil(cantidad) : parseInt(cantidad);
+    localStorage.setItem('productosTotal', totalProductos);
     total.innerHTML = `$ ${costoTotal.toFixed(2)}`;
+    localStorage.setItem('precioTotal', costoTotal.toFixed(2));
     document.getElementById('productosTotal').innerHTML = totalProductos;
     let tmp = `<tr>
     <th scope="row">${contador}</th>
@@ -117,4 +121,20 @@ txtNumero.addEventListener('blur', (e) => {
   e.target.style.color = ''
 });
 
+window.addEventListener('load', () => {
 
+  if(localStorage.getItem('contadorProductos') != null){
+    contador = parseInt(localStorage.getItem('contadorProductos'));
+    document.getElementById('contadorProductos').innerHTML = contador;
+  }
+
+  if(localStorage.getItem('productosTotal') != null){
+    totalProductos = parseInt(localStorage.getItem('productosTotal'));
+    document.getElementById('productosTotal').innerHTML = totalProductos;
+  }
+
+  if(localStorage.getItem('precioTotal') != null){
+    costoTotal = parseFloat(localStorage.getItem('precioTotal'));
+    document.getElementById('precioTotal').innerHTML = `$ ${costoTotal}`;
+  }
+});
