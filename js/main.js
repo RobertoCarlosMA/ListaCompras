@@ -1,105 +1,120 @@
-
+let contador = 0;
+let costoTotal = 0;
+let totalProductos = 0;
+let messageError;
 let element = document.getElementById('totalPrecio');
-element.innerHTML = 'total en precio';
-
 let txtNombre = document.getElementById('Name');
-
-txtNombre.value = 'Pera';
-
-
-// //se crea un htmlcollection parecido a un array porque hay dos elementos
-// let campos = document.getElementsByClassName('campo');
-// console.log(campos);
-// campos[0].value = 'Coca cola';
-// console.log(campos[0].value);
-
-// /* onabort evento cuando se oprime x para cancelar la actualizacion de la pag
-// onblur evento cuando sale del campo
-// onclick
-// ondoubleclick */
-
-// for(let i = 0; i < campos.length; i++){
-//     campos[i].style.border = "red thin solid";
-// }
-
-// console.log(campos[0].style.border);
-
-// //Los spans tienen textContent <span> textContent </span>
-// let spans = document.getElementsByTagName('span');
-
-// for(let i = 0; i < spans.length; i++){
-//     console.log(spans[i].textContent);
-// }
-
-
-
-
-
-
 let tabla = document.getElementById('tablaListaCompras');
-//al buscar getElements se refiere a que creara una HTMLCollection
 let cuerpoTabla = tabla.getElementsByTagName('tbody');
-
-// cuerpoTabla[0].innerHTML = `
-// <tr>
-// <th scope="row">1</th>
-// <td>Coca cola</td>
-// <td>1</td>
-// <td>$30.00</td>
-// <td>$30.00</td>
-// </tr>
-// `
-
-/* 
-            <tr>
-              <th scope="row">1</th>
-              <td>Coca cola</td>
-              <td>1</td>
-              <td>$30.00</td>
-              <td>$30.00</td>
-            </tr>
-*/
-
-
-
+let total = document.getElementById('precioTotal');
 let txtNumero = document.getElementById('Number');
-
 let btnAgregar = document.getElementById('btnAgregar');
+element.innerHTML = 'Total en precio';
 
-console.log(btnAgregar)
+const validarNombre = () => {
+  if(txtNombre.value.trim().length < 3){
+    messageError = '<li>El nombre debe tener por lo menos 3 caracteres.</li>'
 
-// btnAgregar.addEventListener('click', agregarElementos);
+    document.getElementById('alertValidacionesTextoNombre').innerHTML = 'Nombre inválido';
+    document.getElementById('alertValidacionesNombre').style.display = '';
+    txtNombre.style.background = 'pink';
+    txtNombre.style.border = 'red thin solid';
+    return false;
+  }
+  return true;
+}
 
-// function agregarElementos(){
+const validarCantidad = () => {
+  if(txtNumero.value.length == 0 || isNaN(txtNumero.value) || parseFloat(txtNumero.value) <= 0){
+    messageError += '<li>La cantidad debe tener un número mayor a 0.</li>'
+    document.getElementById('alertValidacionesTextoCantidad').innerHTML = 'Número inválido';
+    document.getElementById('alertValidacionesCantidad').style.display = '';
+    txtNumero.style.background = 'pink';
+    txtNumero.style.border = 'red thin solid';
+    return false;
+  }
+  return true;
+}
 
-// }
-
-let count = 1;
 btnAgregar.addEventListener('click', (e) => {
-    // e.ctrlKey    / indica si se oprime control al dar click es booleano
-    //console.log('click', e)
-    // console.log(txtNombre.value, txtNumero.value)
-    const precio = Math.random() * 50;
-    console.log(cuerpoTabla);
+    e.preventDefault();
+    messageError = '';
+    document.getElementById('alertValidacionesTexto').innerHTML = '';
+    btnAgregar.disabled = true;
+    txtNombre.disabled = true;
+    txtNumero.disabled = true;
+    const isValidName = validarNombre();
+    const isValidNumber = validarCantidad();
 
+    if(!isValidName || !isValidNumber){
+      document.getElementById('alertValidacionesTexto').innerHTML = `
+      Los campos deben ser llenados correctamente.
+      <ul>${messageError}</ul>`
+
+      document.getElementById('alertValidaciones').style.display = '';
+
+      setTimeout(() => {
+        document.getElementById('alertValidaciones').style.display = 'none';
+        document.getElementById('alertValidacionesNombre').style.display = 'none';
+        document.getElementById('alertValidacionesCantidad').style.display = 'none';
+        txtNombre.style.background = '';
+        txtNumero.style.background = '';
+        btnAgregar.disabled = false;
+        txtNombre.disabled = false;
+        txtNumero.disabled = false;
+      }, 3000);
+      return;
+    }
+
+    document.getElementById('alertValidaciones').style.display = 'none';
+
+    contador++;
+    document.getElementById('contadorProductos').innerHTML = contador;
+    const precio = Math.floor((Math.random() * 50)*100)/100;
+    const cantidad = parseFloat(txtNumero.value);
+    costoTotal += (Math.floor((cantidad * precio)*100)/100);
+    totalProductos += cantidad < 1 ? Math.ceil(cantidad) : parseInt(cantidad);
+    total.innerHTML = `$ ${costoTotal.toFixed(2)}`;
+    document.getElementById('productosTotal').innerHTML = totalProductos;
     let tmp = `<tr>
-    <th scope="row">${count}</th>
+    <th scope="row">${contador}</th>
     <td>${txtNombre.value}</td>
     <td>${txtNumero.value}</td>
     <td>$${precio}</td>
-    <td>$${parseInt(txtNumero.value) * precio}</td>
+    <td>$${Math.floor((cantidad * precio) * 100) / 100}</td>
     </tr>`
 
-    console.log(tmp)
-
     cuerpoTabla[0].innerHTML += tmp;
-    count++;
-
     txtNombre.value = '';
     txtNumero.value = '';
     txtNombre.focus();
+    btnAgregar.disabled = false;
+    txtNombre.disabled = false;
+    txtNumero.disabled = false;
 });
 
+txtNombre.addEventListener('focus', (e) => {
+  e.target.style.background = 'lightblue';
+  e.target.style.color = 'white';
+  e.target.style.border = '';
+});
 
+txtNumero.addEventListener('focus', (e) => {
+  e.target.style.background = 'lightblue';
+  e.target.style.color = 'white';
+  e.target.style.border = '';
+});
+
+txtNombre.addEventListener('blur', (e) => {
+  e.target.value = e.target.value.trim();
+  e.target.style.background = '';
+  e.target.style.color = ''
+});
+
+txtNumero.addEventListener('blur', (e) => {
+  e.target.value = e.target.value.trim();
+  e.target.style.background = '';
+  e.target.style.color = ''
+});
 
 
