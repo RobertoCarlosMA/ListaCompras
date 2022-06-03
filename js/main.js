@@ -2,6 +2,9 @@ let contador = 0;
 let costoTotal = 0;
 let totalProductos = 0;
 let messageError;
+//arreglo global para almacenar la lista de compras
+let datos = []; 
+let datosHTML = '';
 let element = document.getElementById('totalPrecio');
 let txtNombre = document.getElementById('Name');
 let tabla = document.getElementById('tablaListaCompras');
@@ -80,15 +83,28 @@ btnAgregar.addEventListener('click', (e) => {
     total.innerHTML = `$ ${costoTotal.toFixed(2)}`;
     localStorage.setItem('precioTotal', costoTotal.toFixed(2));
     document.getElementById('productosTotal').innerHTML = totalProductos;
+
+    const elemento = `{ "id": ${contador},  "nombre": "${txtNombre.value}", "cantidad": "${Number(txtNumero.value)}", "precio": "${precio}" }`;
+    datos.push(JSON.parse(elemento));
+    console.log(datos);
+
+    localStorage.setItem('productosTable', JSON.stringify(datos));
+
     let tmp = `<tr>
     <th scope="row">${contador}</th>
     <td>${txtNombre.value}</td>
-    <td>${txtNumero.value}</td>
+    <td>${Number(txtNumero.value)}</td>
     <td>$${precio}</td>
     <td>$${Math.floor((cantidad * precio) * 100) / 100}</td>
     </tr>`
 
-    cuerpoTabla[0].innerHTML += tmp;
+    datosHTML += tmp;
+    localStorage.setItem('datosHTML', datosHTML);
+
+    //cuerpoTabla[0].innerHTML += tmp;
+    cuerpoTabla[0].innerHTML = datosHTML;
+    console.log(cuerpoTabla[0].innerHTML);
+
     txtNombre.value = '';
     txtNumero.value = '';
     txtNombre.focus();
@@ -136,5 +152,23 @@ window.addEventListener('load', () => {
   if(localStorage.getItem('precioTotal') != null){
     costoTotal = parseFloat(localStorage.getItem('precioTotal'));
     document.getElementById('precioTotal').innerHTML = `$ ${costoTotal}`;
+  }
+
+  if(localStorage.getItem('productosTable') != null){
+    datos = JSON.parse(localStorage.getItem('productosTable'));
+    datos.forEach(e => {
+      cuerpoTabla[0].innerHTML += `<tr>
+      <th scope="row">${e.id}</th>
+      <td>${e.nombre}</td>
+      <td>${e.cantidad}</td>
+      <td>$${e.precio}</td>
+      <td>$${(e.precio * e.cantidad).toFixed(2)}</td>
+      </tr>`
+    })
+  }
+
+  if(localStorage.getItem('datosHTML') != null){
+    datosHTML = localStorage.getItem('datosHTML');
+    //cuerpoTabla[0].innerHTML = `${datosHTML}`;
   }
 });
