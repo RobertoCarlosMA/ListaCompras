@@ -171,4 +171,5 @@ window.addEventListener('load', () => {
     datosHTML = localStorage.getItem('datosHTML');
     //cuerpoTabla[0].innerHTML = `${datosHTML}`;
   }
+
 });
